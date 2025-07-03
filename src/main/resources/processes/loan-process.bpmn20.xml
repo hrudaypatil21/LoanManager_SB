@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:flowable="http://flowable.org/bpmn"
+             targetNamespace="Examples">
+
+    <process id="loanApplyProcess" name="Loan Application Process" isExecutable="true">
+
+        <startEvent id="start" name="Process Started"/>
+
+        <sequenceFlow id="toApply" sourceRef="start" targetRef="loanForm" />
+
+<!--        user loan form-->
+        <userTask id="loanForm" name="Loan Form" flowable:assignee="${username}">
+            <extensionElements>
+                <flowable:formProperty id="accountId" name="User ID" type="long" required="true"/>
+<!--                <flowable:formProperty id="occupation" name="Occupation" type="string" required="true"/>-->
+                <flowable:formProperty id="salary" name="Salary" type="double" required="true"/>
+                <flowable:formProperty id="loanAmount" name="Loan Amount" type="double" required="true"/>
+                <flowable:formProperty id="loanPeriod" name="Loan Period" type="int" required="true"/>
+                <flowable:formProperty id="interestRate" name="Loan Interest" type="double" required="true"/>
+            </extensionElements>
+        </userTask>
+
+        <sequenceFlow id="toValidate" sourceRef="loanForm" targetRef="evaluateEligibility" />
+
+<!--        loan eligibility evaluation-->
+        <serviceTask id="evaluateEligibility" name="Evaluate Eligibility" flowable:delegateExpression="${evaluateEligibility}" />
+
+        <sequenceFlow id="toGateway" sourceRef="evaluateEligibility" targetRef="gateway"/>
+
+        <exclusiveGateway id="gateway" name="Eligible?"/>
+
+        <sequenceFlow id="toFailure" sourceRef="gateway" targetRef="notifyFailure">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isEligible == false}]]></conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="toApproval" sourceRef="gateway" targetRef="approveLoan">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${isEligible == true}]]></conditionExpression>
+        </sequenceFlow>
+
+<!--        loan not eligible notify failure-->
+        <serviceTask id="notifyFailure" name="Notify Failure" flowable:delegateExpression="${notifyFailure}"/>
+        <sequenceFlow id="failureToEnd" sourceRef="notifyFailure" targetRef="end"/>
+
+<!--        loan eligible and manual approval-->
+        <userTask id="approveLoan" name="Approve Loan?" flowable:assignee="${username}"/>
+
+        <sequenceFlow id="toFinalApprovalGateway" sourceRef="approveLoan" targetRef="finalApprovalGateway"/>
+
+        <exclusiveGateway id="finalApprovalGateway" name="Banker Approval"/>
+
+        <sequenceFlow id="failureLoanApproval" sourceRef="finalApprovalGateway" targetRef="notifyFailure">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${loanApproved == false}]]></conditionExpression>
+        </sequenceFlow>
+
+        <sequenceFlow id="successLoanApproval" sourceRef="finalApprovalGateway" targetRef="finalApproval">
+            <conditionExpression xsi:type="tFormalExpression"><![CDATA[${loanApproved == true}]]></conditionExpression>
+        </sequenceFlow>
+
+        <serviceTask id="finalApproval" name="Approve Transaction" flowable:delegateExpression="${loanExecution}"/>
+
+        <sequenceFlow id="loanSuccessFlow" sourceRef="finalApproval" targetRef="notifySuccess"/>
+
+<!--        notify success-->
+        <serviceTask id="notifySuccess" name="Notify Approval Success" flowable:delegateExpression="${notifySuccess}"/>
+
+<!--        notify failure-->
+<!--        <serviceTask id="notifyApprovalFailure" name="Notify Approval Failure" flowable:delegateExpression="${notifyApprovalFailure}"/>-->
+
+        <sequenceFlow id="notifyToEnd" sourceRef="notifySuccess" targetRef="end"/>
+
+        <endEvent id="end" name="Transfer End"/>
+
+    </process>
+
+    <!--        <serviceTask id="approveLoan" name="Approve Transaction" flowable:delegateExpression="${loanExecution}"/>-->
+    <!--        <sequenceFlow id="execToNotify" sourceRef="approveLoan" targetRef="notifySuccess"/>-->
+
+    <!--    <exclusiveGateway id="Gateway_1y5kui7" name="Is Eligible based on salary?">-->
+<!--            <bpmn:incoming>Flow_0dhml9z</bpmn:incoming>-->
+<!--            <bpmn:outgoing>Flow_1vrotbu</bpmn:outgoing>-->
+<!--            <bpmn:outgoing>Flow_1pcdymq</bpmn:outgoing>-->
+<!--        </exclusiveGateway>-->
+<!--        <bpmn:sequenceFlow id="Flow_0gicn33" sourceRef="Activity_1nzazcl" targetRef="Activity_1c1rwf3" />-->
+<!--        <bpmn:endEvent id="Event_01w540e">-->
+<!--            <bpmn:incoming>Flow_1r0sfbw</bpmn:incoming>-->
+<!--            <bpmn:incoming>Flow_0rbwdx1</bpmn:incoming>-->
+<!--        </bpmn:endEvent>-->
+<!--        <bpmn:serviceTask id="Activity_1g8sf0v" name="Notify Rejected">-->
+<!--            <bpmn:incoming>Flow_1pcdymq</bpmn:incoming>-->
+<!--            <bpmn:outgoing>Flow_0rbwdx1</bpmn:outgoing>-->
+<!--        </bpmn:serviceTask>-->
+<!--        <bpmn:serviceTask id="Activity_11f1nug" name="Notify Accepted">-->
+<!--            <bpmn:incoming>Flow_1vrotbu</bpmn:incoming>-->
+<!--            <bpmn:outgoing>Flow_1r0sfbw</bpmn:outgoing>-->
+<!--        </bpmn:serviceTask>-->
+<!--        <bpmn:sequenceFlow id="Flow_1vrotbu" name="Yes" sourceRef="Gateway_1y5kui7" targetRef="Activity_11f1nug" />-->
+<!--        <bpmn:sequenceFlow id="Flow_1pcdymq" name="No" sourceRef="Gateway_1y5kui7" targetRef="Activity_1g8sf0v" />-->
+<!--        <bpmn:sequenceFlow id="Flow_1r0sfbw" sourceRef="Activity_11f1nug" targetRef="Event_01w540e" />-->
+<!--        <bpmn:sequenceFlow id="Flow_0rbwdx1" sourceRef="Activity_1g8sf0v" targetRef="Event_01w540e" />-->
+<!--    </process>-->
+<!--    <bpmndi:BPMNDiagram id="BPMNDiagram_1">-->
+<!--        <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_10m0s3n">-->
+<!--            <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1xtdvzq">-->
+<!--                <dc:Bounds x="156" y="232" width="36" height="36" />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Activity_1y5c2v1_di" bpmnElement="Activity_1nzazcl">-->
+<!--                <dc:Bounds x="280" y="210" width="100" height="80" />-->
+<!--                <bpmndi:BPMNLabel />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Activity_1mm3l8e_di" bpmnElement="Activity_1c1rwf3">-->
+<!--                <dc:Bounds x="460" y="210" width="100" height="80" />-->
+<!--                <bpmndi:BPMNLabel />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Gateway_1y5kui7_di" bpmnElement="Gateway_1y5kui7" isMarkerVisible="true">-->
+<!--                <dc:Bounds x="645" y="225" width="50" height="50" />-->
+<!--                <bpmndi:BPMNLabel>-->
+<!--                    <dc:Bounds x="705" y="236" width="84" height="27" />-->
+<!--                </bpmndi:BPMNLabel>-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Event_01w540e_di" bpmnElement="Event_01w540e">-->
+<!--                <dc:Bounds x="952" y="232" width="36" height="36" />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Activity_10f5rxr_di" bpmnElement="Activity_1g8sf0v">-->
+<!--                <dc:Bounds x="620" y="380" width="100" height="80" />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNShape id="Activity_1wfn8im_di" bpmnElement="Activity_11f1nug">-->
+<!--                <dc:Bounds x="620" y="80" width="100" height="80" />-->
+<!--            </bpmndi:BPMNShape>-->
+<!--            <bpmndi:BPMNEdge id="Flow_0jmuod2_di" bpmnElement="Flow_0jmuod2">-->
+<!--                <di:waypoint x="192" y="250" />-->
+<!--                <di:waypoint x="280" y="250" />-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_0gicn33_di" bpmnElement="Flow_0gicn33">-->
+<!--                <di:waypoint x="380" y="250" />-->
+<!--                <di:waypoint x="460" y="250" />-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_0dhml9z_di" bpmnElement="Flow_0dhml9z">-->
+<!--                <di:waypoint x="560" y="250" />-->
+<!--                <di:waypoint x="645" y="250" />-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_1vrotbu_di" bpmnElement="Flow_1vrotbu">-->
+<!--                <di:waypoint x="670" y="225" />-->
+<!--                <di:waypoint x="670" y="160" />-->
+<!--                <bpmndi:BPMNLabel>-->
+<!--                    <dc:Bounds x="676" y="190" width="18" height="14" />-->
+<!--                </bpmndi:BPMNLabel>-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_1pcdymq_di" bpmnElement="Flow_1pcdymq">-->
+<!--                <di:waypoint x="670" y="275" />-->
+<!--                <di:waypoint x="670" y="380" />-->
+<!--                <bpmndi:BPMNLabel>-->
+<!--                    <dc:Bounds x="678" y="325" width="15" height="14" />-->
+<!--                </bpmndi:BPMNLabel>-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_1r0sfbw_di" bpmnElement="Flow_1r0sfbw">-->
+<!--                <di:waypoint x="720" y="120" />-->
+<!--                <di:waypoint x="836" y="120" />-->
+<!--                <di:waypoint x="836" y="250" />-->
+<!--                <di:waypoint x="952" y="250" />-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--            <bpmndi:BPMNEdge id="Flow_0rbwdx1_di" bpmnElement="Flow_0rbwdx1">-->
+<!--                <di:waypoint x="720" y="420" />-->
+<!--                <di:waypoint x="836" y="420" />-->
+<!--                <di:waypoint x="836" y="250" />-->
+<!--                <di:waypoint x="952" y="250" />-->
+<!--            </bpmndi:BPMNEdge>-->
+<!--        </bpmndi:BPMNPlane>-->
+<!--    </bpmndi:BPMNDiagram>-->
+
+</definitions>
