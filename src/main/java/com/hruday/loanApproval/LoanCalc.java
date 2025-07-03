@@ -4,86 +4,52 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanCalc {
+    private static final int MIN_TERM_MONTHS = 12;  // 1 year
+    private static final int MAX_TERM_MONTHS = 180; // 15 years
+    private static final double MAX_EMI_RATIO = 0.4; // 40% of salary
 
     public int calcOptimalPeriod(double salary, double loanAmount, double interestRate) {
+        validateInputs(salary, loanAmount, interestRate);
+        double monthlyRate = interestRate / 100 / 12;
 
-        if (salary <= 0 || loanAmount <= 0 || interestRate <= 0) {
-            throw new IllegalArgumentException("Invalid input values");
-        }
-
-        double maxEmi = salary * 0.4;
-        double monthlyRate = interestRate / 12 / 100;
-
-        int optimalPeriod = -1;
-
-        for (int n = 12; n <= 360; n++) {
-            double numerator = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, n);
-            double denominator = Math.pow(1 + monthlyRate, n) - 1;
-            double emi = numerator / denominator;
-
-            if (emi <= maxEmi) {
-                optimalPeriod = n;
-                break;
+        for (int n = MIN_TERM_MONTHS; n <= MAX_TERM_MONTHS; n++) {
+            double emi = calculateEmi(loanAmount, monthlyRate, n);
+            if (emi <= salary * MAX_EMI_RATIO) {
+                System.out.printf("Optimal Period: %d months (EMI: ₹%.2f)%n", n, emi);
+                return n;
             }
-
-            System.out.println("Optimal Loan Period: " + optimalPeriod + " months");
         }
-
-        if (optimalPeriod == -1) {
-            throw new RuntimeException("Loan amount too high for current salary and interest rate");
-        }
-
-        return optimalPeriod;
+        throw new RuntimeException(String.format(
+                "No feasible term found. Loan amount ₹%.2f at %.2f%% exceeds %.0f%% of salary ₹%.2f",
+                loanAmount, interestRate, MAX_EMI_RATIO*100, salary
+        ));
     }
 
     public double calcEmi(double salary, double loanAmount, double interestRate) {
+        validateInputs(salary, loanAmount, interestRate);
+        double monthlyRate = interestRate / 100 / 12;
 
-// Max EMI = 40% of monthly salary
-        double maxEmi = salary * 0.4;
-        double monthlyRate = interestRate / 12 / 100;
-
-// Start with min 12 months and go up to max 360 months (30 years)
-        double finalEmi = -1;
-
-        for (int n = 12; n <= 360; n++) {
-            double numerator = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, n);
-            double denominator = Math.pow(1 + monthlyRate, n) - 1;
-            double emi = numerator / denominator;
-
-            if (emi <= maxEmi) {
-                finalEmi = emi;
-                break;
+        for (int n = MIN_TERM_MONTHS; n <= MAX_TERM_MONTHS; n++) {
+            double emi = calculateEmi(loanAmount, monthlyRate, n);
+            if (emi <= salary * MAX_EMI_RATIO) {
+                System.out.printf("Valid EMI: ₹%.2f for %d months%n", emi, n);
+                return emi;
             }
         }
-
-        System.out.println("Estimated EMI: ₹" + String.format("%.2f", finalEmi));
-
-        return finalEmi;
+        throw new RuntimeException("No EMI found within affordable range");
     }
 
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @Column(name = "account_id")
-//    private Long accountId;
-//
-//    @Column(name = "loan_amount")
-//    private double loanAmount;
-//
-//    @Column(name = "interest_rate")
-//    private double interestRate;
-//
-//    @Column(name = "loan_period")
-//    private int loanPeriod;
-//
-//    @Column(name = "emi")
-//    private double emi;
-//
-//    @Column(name = "approval_date")
-//    private LocalDate approvalDate = LocalDate.now();
-//
-//    @Column(name = "finish_date")
-//    private LocalDate finishDate;
+    private double calculateEmi(double principal, double monthlyRate, int months) {
+        return principal * monthlyRate * Math.pow(1 + monthlyRate, months)
+                / (Math.pow(1 + monthlyRate, months) - 1);
+    }
 
+    private void validateInputs(double salary, double loanAmount, double interestRate) {
+        if (salary <= 0 || loanAmount <= 0 || interestRate <= 0) {
+            throw new IllegalArgumentException(
+                    String.format("Invalid inputs - Salary: ₹%.2f, Loan: ₹%.2f, Rate: %.2f%%",
+                            salary, loanAmount, interestRate)
+            );
+        }
+    }
 }

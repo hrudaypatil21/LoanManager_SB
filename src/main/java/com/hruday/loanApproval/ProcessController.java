@@ -22,7 +22,8 @@ public class ProcessController {
     @PostMapping("/submit-loan")
     public ResponseEntity<String> submitLoanTask(@RequestBody LoanDetailsDTO loanDetailsDTO) {
         String nextTaskId = loanProcessService.completeLoanForm(loanDetailsDTO.getTaskId(), loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
-        return ResponseEntity.ok().body("Submitted, next task ID: " + nextTaskId);
+        String responseMessage = String.format("Loan details: \nAccount ID: %d\nSalary: %.2f\nLoan Amount: %.2f\nInterest Rate: %.2f", loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
+        return ResponseEntity.ok().body("Submitted, next task ID: " + nextTaskId + "\n"+responseMessage);
     }
 
     @PostMapping("/approve-loan")

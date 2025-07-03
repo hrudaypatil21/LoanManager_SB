@@ -25,33 +25,30 @@ public class EvaluateLoanDelegate implements JavaDelegate {
     public void execute(DelegateExecution execution) {
         try {
             Long accountId = (Long) execution.getVariable("accountId");
-//        String occupation = (String) execution.getVariable("occupation");
             double salary = (double) execution.getVariable("salary");
             double loanAmount = (double) execution.getVariable("loanAmount");
-//        int loanPeriod = (int) execution.getVariable("loanPeriod");
             double interestRate = (double) execution.getVariable("interestRate");
-
 
             if (!accountRepository.existsById(accountId)) {
                 throw new RuntimeException("Account not found: " + accountId);
             }
 
-//        double monthlyRate = interestRate / 12 / 100;
-//        double numerator = loanAmount * monthlyRate * Math.pow(1 + monthlyRate, loanPeriod);
-//        double denominator = Math.pow(1 + monthlyRate, loanPeriod) - 1;
-//        double emi = numerator / denominator;
-
-            double emi = loanCalc.calcOptimalPeriod(salary, loanAmount, interestRate);
-//        int loanPeriod = loanCalc.calcOptimalPeriod(salary, loanAmount, interestRate);
+            double emi = loanCalc.calcEmi(salary, loanAmount, interestRate);
+            int period = loanCalc.calcOptimalPeriod(salary, loanAmount, interestRate);
             boolean isEligible = emi <= salary * 0.45;
 
-
-            //will implement returning emi later
-//        execution.setVariable("emi", emi);
             execution.setVariable("emi", emi);
             execution.setVariable("isEligible", isEligible);
 
-            logger.info("Starting eligibility evaluation");
+            logger.info("Loan details: \nAccount ID: "+accountId+"\nSalary: "+salary+"\nLoan Amount: "+loanAmount+"\nInterest Rate: "+interestRate+"\nEMI: "+emi+"\nPeriod: "+period+" months");
+
+            if (!isEligible) {
+                execution.setVariable("failureReason",
+                        "EMI " + emi + " exceeds 45% of salary " + salary);
+                throw new RuntimeException("Loan not eligible");
+
+            }
+
         } catch (Exception e) {
             execution.setVariable("errorMessage", e.getMessage());
             throw e;

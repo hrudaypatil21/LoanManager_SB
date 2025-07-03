@@ -58,6 +58,7 @@ public class ExecutionDelegate implements JavaDelegate {
             execution.setVariable("emi", emi);
             execution.setVariable("loanPeriod", loanPeriod);
 
+
             logger.info("Executing loan approval process");
         } catch (Exception e) {
             execution.setVariable("errorMessage", e.getMessage());

@@ -1,18 +1,25 @@
 package com.hruday.loanApproval;
 
+import com.hruday.loanApproval.Delegate.ExecutionDelegate;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @Service
 public class LoanProcessService {
 
+    @Autowired
+            private LoanCalc loanCalc;
+
+    Logger logger = Logger.getLogger(ExecutionDelegate.class.getName());
     private final RuntimeService runtimeService;
     private final TaskService taskService;
     private final IdentityService identityService;
@@ -37,7 +44,6 @@ public class LoanProcessService {
         Task task =taskService.createTaskQuery()
                 .processInstanceId(instance.getId())
                 .singleResult();
-
         return task != null ? task.getId() : null;
     }
 
@@ -53,14 +59,27 @@ public class LoanProcessService {
         variables.put("loanAmount", loanAmount);
         variables.put("interestRate", interestRate);
 
-        taskService.complete(taskId, variables);
 
-        Task nextTask = taskService.createTaskQuery()
-                .processInstanceId(task.getProcessInstanceId())
-                .active()
-                .singleResult();
+        try {
+            taskService.complete(taskId, variables);
 
-        return nextTask != null ? nextTask.getId() : "Process completed";
+            ProcessInstance instance = runtimeService.createProcessInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .singleResult();
+
+            if(instance == null) {
+                return "Loan not eligible";
+            }
+
+            Task nextTask = taskService.createTaskQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .active()
+                    .singleResult();
+
+            return nextTask != null ? nextTask.getId() : "Process completed";
+        } catch (Exception e) {
+            return "Loan rejected: " + e.getMessage();
+        }
     }
 
     public String approveLoan(String taskId, boolean approved) {
