@@ -55,6 +55,30 @@ public class LoanProcessService {
 
         taskService.complete(taskId, variables);
 
-        return "Loan form submitted successfully.";
+        Task nextTask = taskService.createTaskQuery()
+                .processInstanceId(task.getProcessInstanceId())
+                .active()
+                .singleResult();
+
+        return nextTask != null ? nextTask.getId() : "Process completed";
     }
+
+    public String approveLoan(String taskId, boolean approved) {
+        Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
+
+        if(task==null) {
+            throw new RuntimeException("Approval task not found for ID: " + taskId);
+        }
+
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("loanApproved", approved);
+
+        taskService.complete(taskId, vars);
+
+        Task nextTask = taskService.createTaskQuery()
+                .processInstanceId(task.getProcessInstanceId())
+                .active()
+                .singleResult();
+
+        return nextTask != null ? nextTask.getId() : "Process completed";    }
 }
