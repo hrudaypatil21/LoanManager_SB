@@ -40,7 +40,7 @@ public class EvaluateLoanDelegate implements JavaDelegate {
             execution.setVariable("emi", emi);
             execution.setVariable("isEligible", isEligible);
 
-            logger.info("Loan details: \nAccount ID: "+accountId+"\nSalary: "+salary+"\nLoan Amount: "+loanAmount+"\nInterest Rate: "+interestRate+"\nEMI: "+emi+"\nPeriod: "+period+" months");
+            logger.info("\nLoan details: \nAccount ID: "+accountId+"\nSalary: "+salary+"\nLoan Amount: "+loanAmount+"\nInterest Rate: "+interestRate+"\nEMI: "+emi+"\nPeriod: "+period+" months");
 
             if (!isEligible) {
                 execution.setVariable("failureReason",

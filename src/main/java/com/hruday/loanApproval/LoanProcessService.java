@@ -99,5 +99,6 @@ public class LoanProcessService {
                 .active()
                 .singleResult();
 
-        return nextTask != null ? nextTask.getId() : "Process completed";    }
+        return "\nProcess completed";
+    }
 }

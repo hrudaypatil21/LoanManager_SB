@@ -4,9 +4,9 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class LoanCalc {
-    private static final int MIN_TERM_MONTHS = 12;  // 1 year
-    private static final int MAX_TERM_MONTHS = 180; // 15 years
-    private static final double MAX_EMI_RATIO = 0.4; // 40% of salary
+    private static final int MIN_TERM_MONTHS = 12;
+    private static final int MAX_TERM_MONTHS = 180;
+    private static final double MAX_EMI_RATIO = 0.4;
 
     public int calcOptimalPeriod(double salary, double loanAmount, double interestRate) {
         validateInputs(salary, loanAmount, interestRate);
@@ -15,12 +15,12 @@ public class LoanCalc {
         for (int n = MIN_TERM_MONTHS; n <= MAX_TERM_MONTHS; n++) {
             double emi = calculateEmi(loanAmount, monthlyRate, n);
             if (emi <= salary * MAX_EMI_RATIO) {
-                System.out.printf("Optimal Period: %d months (EMI: ₹%.2f)%n", n, emi);
+//                System.out.printf("Optimal Period: %d months (EMI: ₹%.2f)%n", n, emi);
                 return n;
             }
         }
         throw new RuntimeException(String.format(
-                "No feasible term found. Loan amount ₹%.2f at %.2f%% exceeds %.0f%% of salary ₹%.2f",
+                "\nNo feasible term found. Loan amount ₹%.2f at %.2f%% exceeds %.0f%% of salary ₹%.2f",
                 loanAmount, interestRate, MAX_EMI_RATIO*100, salary
         ));
     }

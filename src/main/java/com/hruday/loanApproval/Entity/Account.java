@@ -1,7 +1,6 @@
 package com.hruday.loanApproval.Entity;
 
 import javax.persistence.*;
-
 import java.util.Objects;
 
 @Entity

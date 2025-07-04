@@ -22,14 +22,14 @@ public class ProcessController {
     @PostMapping("/submit-loan")
     public ResponseEntity<String> submitLoanTask(@RequestBody LoanDetailsDTO loanDetailsDTO) {
         String nextTaskId = loanProcessService.completeLoanForm(loanDetailsDTO.getTaskId(), loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
-        String responseMessage = String.format("Loan details: \nAccount ID: %d\nSalary: %.2f\nLoan Amount: %.2f\nInterest Rate: %.2f", loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
-        return ResponseEntity.ok().body("Submitted, next task ID: " + nextTaskId + "\n"+responseMessage);
+        String responseMessage = String.format("\nLoan details: \nAccount ID: %d\nSalary: %.2f\nLoan Amount: %.2f\nInterest Rate: %.2f", loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
+        return ResponseEntity.ok().body("\nSubmitted, next task ID: " + nextTaskId + "\n"+responseMessage);
     }
 
     @PostMapping("/approve-loan")
     public ResponseEntity<String> approveLoan(@RequestParam String taskId, @RequestParam boolean approved) {
         String nextTaskId = loanProcessService.approveLoan(taskId, approved);
-        String message = approved ? "Loan approved" : "Loan rejected";
-        return ResponseEntity.ok().body(message + ", next task ID: " + nextTaskId);
+        String message = approved ? "\nLoan approved" : "\nLoan rejected";
+        return ResponseEntity.ok().body("\n"+message + ", next task ID: " + nextTaskId);
     }
 }

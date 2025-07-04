@@ -1,7 +1,6 @@
 package com.hruday.loanApproval.Delegate;
 
 import com.hruday.loanApproval.AccountRepository;
-import com.hruday.loanApproval.Entity.Account;
 import com.hruday.loanApproval.Entity.Loan;
 import com.hruday.loanApproval.LoanCalc;
 import com.hruday.loanApproval.LoanRepository;
@@ -43,7 +42,6 @@ public class ExecutionDelegate implements JavaDelegate {
             double emi = loanCalc.calcEmi(salary, loanAmount, interestRate);
             int loanPeriod = loanCalc.calcOptimalPeriod(salary, loanAmount, interestRate);
 
-            //will implement returning emi later
             Loan newLoan = new Loan();
             newLoan.setAccountId(accountId);
             newLoan.setLoanAmount(loanAmount);
