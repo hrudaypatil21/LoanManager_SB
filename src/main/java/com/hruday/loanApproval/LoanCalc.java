@@ -40,7 +40,7 @@ public class LoanCalc {
     }
 
     private double calculateEmi(double principal, double monthlyRate, int months) {
-        return principal * monthlyRate * Math.pow(1 + monthlyRate, months)
+        return principal * monthlyRate * Math.pow(1 + monthlyRate, months)   //EMI = [P × r × (1+r)^n]/[(1+r)^n-1]
                 / (Math.pow(1 + monthlyRate, months) - 1);
     }
 
