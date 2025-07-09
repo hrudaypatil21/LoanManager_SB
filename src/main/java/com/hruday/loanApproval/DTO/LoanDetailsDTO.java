@@ -20,7 +20,6 @@ public class LoanDetailsDTO {
         this.interestRate = interestRate;
     }
 
-    // Getters and Setters
     public String getTaskId() {
         return taskId;
     }

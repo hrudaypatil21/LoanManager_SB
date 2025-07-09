@@ -3,7 +3,6 @@ package com.hruday.loanApproval.Delegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.springframework.stereotype.Component;
-
 import java.util.logging.Logger;
 
 @Component("notifyFailure")

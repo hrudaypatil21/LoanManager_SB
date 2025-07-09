@@ -1,8 +1,11 @@
 package com.hruday.loanApproval;
 
 import com.hruday.loanApproval.DTO.LoanDetailsDTO;
-import liquibase.pro.packaged.S;
+import com.hruday.loanApproval.ExceptionHandler.ErrorResponse;
+import com.hruday.loanApproval.ExceptionHandler.LoanIneligibleException;
+//import com.hruday.loanApproval.ExceptionHandler.LoanRejectException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,4 +35,16 @@ public class ProcessController {
         String message = approved ? "\nLoan approved" : "\nLoan rejected";
         return ResponseEntity.ok().body("\n"+message + ", next task ID: " + nextTaskId);
     }
+
+    @ExceptionHandler(value = LoanIneligibleException.class)
+    @ResponseStatus(HttpStatus.NOT_ACCEPTABLE)
+    public ErrorResponse handleLoanIneligibleException(LoanIneligibleException e) {
+        return new ErrorResponse(HttpStatus.NOT_ACCEPTABLE.value(), e.getMessage());
+    }
+
+//    @ExceptionHandler(value = LoanRejectException.class)
+//    @ResponseStatus(HttpStatus.GONE)
+//    public ErrorResponse handleLoanRejectedException(LoanRejectException e) {
+//        return new ErrorResponse(HttpStatus.GONE.value(), e.getMessage());
+//    }
 }

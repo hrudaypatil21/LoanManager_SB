@@ -60,24 +60,9 @@ public class ExecutionDelegate implements JavaDelegate {
             logger.info("Executing loan approval process");
         } catch (Exception e) {
             execution.setVariable("errorMessage", e.getMessage());
-            throw e;        }
+            throw e;
+        }
     }
 }
 
-//        execution.setVariable("emi", emi);
-
-//        @Column(name = "account_id")
-//        private Long accountId;
-//
-//        @Column(name = "loan_amount")
-//        private double loanAmount;
-//
-//        @Column(name = "interest_rate")
-//        private double interestRate;
-//
-//        @Column(name = "loan_period")
-//        private int loanPeriod;
-//
-//        @Column(name = "emi")
-//        private double emi;
 

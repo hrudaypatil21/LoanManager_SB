@@ -6,22 +6,20 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.2.8.RELEASE</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
-	<!-- Other project metadata remains the same -->
 	<groupId>com.hruday</groupId>
 	<artifactId>loanApproval</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
-		<java.version>11</java.version> <!-- Changed from 21 to 11 -->
-		<flowable.version>6.6.0</flowable.version> <!-- Added Flowable version -->
+		<java.version>11</java.version>
+		<flowable.version>6.6.0</flowable.version>
 		<spring-cloud.version>2025.0.0</spring-cloud.version>
 	</properties>
 
 	<dependencies>
-		<!-- Spring Boot starters -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -31,7 +29,6 @@
 			<artifactId>spring-boot-starter-web</artifactId>
 		</dependency>
 
-		<!-- Database -->
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -44,7 +41,6 @@
 			<scope>runtime</scope>
 		</dependency>
 
-		<!-- Lombok -->
 <!--		<dependency>-->
 <!--			<groupId>org.projectlombok</groupId>-->
 <!--			<artifactId>lombok</artifactId>-->
@@ -52,14 +48,12 @@
 <!--			<scope>provided</scope>-->
 <!--		</dependency>-->
 
-		<!-- Testing -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
 
-		<!-- Flowable dependencies -->
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-spring-boot-starter</artifactId>

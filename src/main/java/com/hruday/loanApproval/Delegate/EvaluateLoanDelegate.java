@@ -1,7 +1,8 @@
 package com.hruday.loanApproval.Delegate;
 
 import com.hruday.loanApproval.AccountRepository;
-import com.hruday.loanApproval.Entity.Account;
+import com.hruday.loanApproval.ExceptionHandler.AccountNotFoundException;
+import com.hruday.loanApproval.ExceptionHandler.LoanIneligibleException;
 import com.hruday.loanApproval.LoanCalc;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
@@ -30,7 +31,7 @@ public class EvaluateLoanDelegate implements JavaDelegate {
             double interestRate = (double) execution.getVariable("interestRate");
 
             if (!accountRepository.existsById(accountId)) {
-                throw new RuntimeException("Account not found: " + accountId);
+                throw new AccountNotFoundException("Account not found: " + accountId);
             }
 
             double emi = loanCalc.calcEmi(salary, loanAmount, interestRate);
@@ -50,8 +51,7 @@ public class EvaluateLoanDelegate implements JavaDelegate {
             }
 
         } catch (Exception e) {
-            execution.setVariable("errorMessage", e.getMessage());
-            throw e;
+            throw new LoanIneligibleException("Loan application ineligible: " + e.getMessage());
         }
 
     }

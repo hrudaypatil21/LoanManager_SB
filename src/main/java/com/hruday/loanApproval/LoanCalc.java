@@ -15,7 +15,6 @@ public class LoanCalc {
         for (int n = MIN_TERM_MONTHS; n <= MAX_TERM_MONTHS; n++) {
             double emi = calculateEmi(loanAmount, monthlyRate, n);
             if (emi <= salary * MAX_EMI_RATIO) {
-//                System.out.printf("Optimal Period: %d months (EMI: ₹%.2f)%n", n, emi);
                 return n;
             }
         }
