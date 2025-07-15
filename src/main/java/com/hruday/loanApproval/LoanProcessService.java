@@ -10,7 +10,9 @@ import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -47,7 +49,7 @@ public class LoanProcessService {
         return task != null ? task.getId() : null;
     }
 
-    public String completeLoanForm(String taskId, Long accountId, double salary, double loanAmount, double interestRate) {
+    public String completeLoanForm(String taskId, Long accountId, double salary, double loanAmount, double interestRate, String pan) {
         Task task = taskService.createTaskQuery().taskId(taskId).singleResult();
         if (task == null) {
             throw new RuntimeException("Task not found for ID: " + taskId);
@@ -58,7 +60,7 @@ public class LoanProcessService {
         variables.put("salary", salary);
         variables.put("loanAmount", loanAmount);
         variables.put("interestRate", interestRate);
-
+        variables.put("pan", pan);
 
         try {
             taskService.complete(taskId, variables);
@@ -101,6 +103,27 @@ public class LoanProcessService {
                 .singleResult();
 
         return "\nProcess completed";
+    }
+    public List<Map<String, Object>> documentVerification() {
+        List<Task> tasks = taskService.createTaskQuery()
+                .taskName("Document Verification")
+                .list();
+
+        List<Map<String, Object>> result = new ArrayList<>();
+
+        for(Task task : tasks) {
+            Map<String, Object> vars = runtimeService.getVariables(task.getProcessInstanceId());
+
+            Map<String, Object> taskDetails = new HashMap<>();
+            taskDetails.put("processInstanceId", task.getProcessInstanceId());
+            taskDetails.put("variables", vars);
+            taskDetails.put("createTime", task.getCreateTime());
+            taskDetails.put("taskName", task.getName());
+            taskDetails.put("taskId", task.getId());
+
+            result.add(taskDetails);
+        }
+        return result;
     }
 
 }

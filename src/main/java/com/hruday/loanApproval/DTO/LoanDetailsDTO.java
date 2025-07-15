@@ -8,16 +8,18 @@ public class LoanDetailsDTO {
     private double salary;
     private double loanAmount;
     private double interestRate;
+    private String pan;
 
     public LoanDetailsDTO() {
     }
 
-    public LoanDetailsDTO(String taskId, long accountId, double salary, double loanAmount, double interestRate) {
+    public LoanDetailsDTO(String taskId, long accountId, double salary, double loanAmount, double interestRate, String pan) {
         this.taskId = taskId;
         this.accountId = accountId;
         this.salary = salary;
         this.loanAmount = loanAmount;
         this.interestRate = interestRate;
+        this.pan = pan;
     }
 
     public String getTaskId() {
@@ -60,6 +62,14 @@ public class LoanDetailsDTO {
         this.interestRate = interestRate;
     }
 
+    public String getPan() {
+        return pan;
+    }
+
+    public void setPan(String Pan) {
+        this.pan = pan;
+    }
+
     // equals() and hashCode()
     @Override
     public boolean equals(Object o) {
@@ -86,6 +96,7 @@ public class LoanDetailsDTO {
                 ", salary=" + salary +
                 ", loanAmount=" + loanAmount +
                 ", interestRate=" + interestRate +
+                ", pan=" + pan +
                 '}';
     }
 }

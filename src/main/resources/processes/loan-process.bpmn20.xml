@@ -25,6 +25,7 @@
                 <flowable:formProperty id="loanAmount" name="Loan Amount" type="double" required="true"/>
                 <flowable:formProperty id="loanPeriod" name="Loan Period" type="int" required="true"/>
                 <flowable:formProperty id="interestRate" name="Loan Interest" type="double" required="true"/>
+                <flowable:formProperty id="pan" name="PAN Number" type="string" required="true"/>
             </extensionElements>
         </userTask>
 

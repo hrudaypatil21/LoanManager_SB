@@ -9,6 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api/process")
 public class ProcessController {
@@ -24,8 +27,14 @@ public class ProcessController {
 
     @PostMapping("/submit-loan")
     public ResponseEntity<String> submitLoanTask(@RequestBody LoanDetailsDTO loanDetailsDTO) {
-        String nextTaskId = loanProcessService.completeLoanForm(loanDetailsDTO.getTaskId(), loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
-        String responseMessage = String.format("\nLoan details: \nAccount ID: %d\nSalary: %.2f\nLoan Amount: %.2f\nInterest Rate: %.2f", loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate());
+        String nextTaskId = loanProcessService.completeLoanForm(
+                loanDetailsDTO.getTaskId(),
+                loanDetailsDTO.getAccountId(),
+                loanDetailsDTO.getSalary(),
+                loanDetailsDTO.getLoanAmount(),
+                loanDetailsDTO.getInterestRate(),
+                loanDetailsDTO.getPan());
+        String responseMessage = String.format("\nLoan details: \nAccount ID: %d\nSalary: %.2f\nLoan Amount: %.2f\nInterest Rate: %.2f\nPan: %s", loanDetailsDTO.getAccountId(), loanDetailsDTO.getSalary(), loanDetailsDTO.getLoanAmount(), loanDetailsDTO.getInterestRate(), loanDetailsDTO.getPan());
         return ResponseEntity.ok().body("\nSubmitted, next task ID: " + nextTaskId + "\n"+responseMessage);
     }
 
@@ -34,6 +43,12 @@ public class ProcessController {
         String nextTaskId = loanProcessService.approveLoan(taskId, approved);
         String message = approved ? "\nLoan approved" : "\nLoan rejected";
         return ResponseEntity.ok().body("\n"+message + ", next task ID: " + nextTaskId);
+    }
+
+    @PostMapping("/document-verification")
+    public ResponseEntity<List<Map<String,Object>>> documentVerification() {
+        List<Map<String, Object>> results = loanProcessService.documentVerification();
+        return ResponseEntity.ok(results);
     }
 
     @ExceptionHandler(value = LoanIneligibleException.class)
